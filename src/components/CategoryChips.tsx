@@ -5,7 +5,7 @@ export default function CategoryChips({
 }: { selected: string; onSelect: (cat: string) => void }) {
   const all = ['Tümü', ...CATEGORIES];
   return (
-    <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0">
+    <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
       {all.map(cat => (
         <button
           key={cat}

@@ -86,7 +86,7 @@ export default function Home() {
           <PlayStoreBanner compact />
         </div>
 
-        <div className="mb-6">
+        <div className="mb-8">
           <CategoryChips selected={category} onSelect={setCategory} />
         </div>
 
