@@ -3,6 +3,7 @@ import Header from '../components/Header';
 import CategoryChips from '../components/CategoryChips';
 import DiscountCard from '../components/DiscountCard';
 import { PlayStoreBanner } from '../components/PlayStoreCTA';
+import BottomNav from '../components/BottomNav';
 import { fetchFirstPage, fetchPage, type DiscountsPage } from '../services/discountService';
 import type { Discount } from '../types';
 import type { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
@@ -51,12 +52,12 @@ export default function Home() {
   }, [discounts, category, search]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 pb-20">
       <Header search={search} onSearch={setSearch} />
 
       <main className="max-w-6xl mx-auto px-4 py-4">
         <div className="mb-4">
-          <PlayStoreBanner />
+          <PlayStoreBanner compact />
         </div>
 
         <div className="mb-4">
@@ -104,6 +105,7 @@ export default function Home() {
       <footer className="mt-10 border-t border-gray-100 py-8 text-center text-xs text-gray-400">
         <p>© {new Date().getFullYear()} İNDİVA — En iyi indirim fırsatları</p>
       </footer>
+      <BottomNav />
     </div>
   );
 }

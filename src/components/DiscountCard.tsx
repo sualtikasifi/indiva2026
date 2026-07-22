@@ -78,7 +78,7 @@ export default function DiscountCard({ d }: { d: Discount }) {
         )}
         <p className="text-sm font-semibold text-gray-800 leading-tight line-clamp-2 flex-1">{d.title}</p>
 
-        <div className="flex items-center gap-1.5 mt-1">
+        <div className="flex items-center justify-center gap-1.5 mt-1">
           {d.oldPrice > 0 ? (
             <>
               <span className="text-[11px] text-white bg-gray-700 px-1.5 py-0.5 rounded line-through">

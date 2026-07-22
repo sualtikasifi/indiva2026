@@ -5,17 +5,20 @@ import type { Discount } from '../types';
 import { formatPrice, timeAgo } from '../utils/time';
 import { PlayStoreBanner, PLAY_STORE_URL } from '../components/PlayStoreCTA';
 import { isFavorite as checkFavorite, toggleFavorite } from '../services/favorites';
+import BottomNav from '../components/BottomNav';
 
 export default function Detail() {
   const { id } = useParams<{ id: string }>();
   const [discount, setDiscount] = useState<Discount | null | undefined>(undefined);
   const [fav, setFav] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [showAppPrompt, setShowAppPrompt] = useState(true);
 
   useEffect(() => {
     if (!id) return;
     fetchDiscountById(id).then(setDiscount);
     setFav(checkFavorite(id));
+    setShowAppPrompt(true);
   }, [id]);
 
   const handleShare = async () => {
@@ -53,7 +56,40 @@ export default function Detail() {
     : 0;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 pb-20">
+      {showAppPrompt && (
+        <div className="fixed inset-0 z-40 bg-black/60 flex items-end sm:items-center justify-center p-4">
+          <div className="bg-white rounded-2xl w-full max-w-sm p-6 text-center relative">
+            <button
+              onClick={() => setShowAppPrompt(false)}
+              aria-label="Kapat"
+              className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-xl leading-none"
+            >
+              ✕
+            </button>
+            <p className="text-4xl mb-3">📲</p>
+            <h2 className="text-base font-bold text-gray-800 mb-1.5">Tüm detayları uygulamada gör</h2>
+            <p className="text-sm text-gray-500 mb-5">
+              Favorileme, fiyat geçmişi ve bildirimler için İNDİVA uygulamasını indirin.
+            </p>
+            <a
+              href={PLAY_STORE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block bg-orange hover:bg-orange-dark text-white font-bold py-3 rounded-xl transition-colors mb-2"
+            >
+              Play Store'da Aç
+            </a>
+            <button
+              onClick={() => setShowAppPrompt(false)}
+              className="text-xs text-gray-400 hover:text-gray-600 underline"
+            >
+              Web'de devam et
+            </button>
+          </div>
+        </div>
+      )}
+
       <header className="sticky top-0 z-20 bg-white/90 backdrop-blur border-b border-gray-100">
         <div className="max-w-3xl mx-auto px-4 py-3 flex items-center gap-3">
           <Link to="/" className="text-gray-500 hover:text-gray-800">← Geri</Link>
@@ -128,6 +164,7 @@ export default function Detail() {
           </div>
         </div>
       </main>
+      <BottomNav />
     </div>
   );
 }
