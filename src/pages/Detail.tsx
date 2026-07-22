@@ -4,15 +4,31 @@ import { fetchDiscountById } from '../services/discountService';
 import type { Discount } from '../types';
 import { formatPrice, timeAgo } from '../utils/time';
 import { PlayStoreBanner, PLAY_STORE_URL } from '../components/PlayStoreCTA';
+import { isFavorite as checkFavorite, toggleFavorite } from '../services/favorites';
 
 export default function Detail() {
   const { id } = useParams<{ id: string }>();
   const [discount, setDiscount] = useState<Discount | null | undefined>(undefined);
+  const [fav, setFav] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (!id) return;
     fetchDiscountById(id).then(setDiscount);
+    setFav(checkFavorite(id));
   }, [id]);
+
+  const handleShare = async () => {
+    const url = `https://indiva.shop/detay/${id}`;
+    if (navigator.share) {
+      try { await navigator.share({ title: discount?.title, url }); return; } catch { return; }
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {}
+  };
 
   if (discount === undefined) {
     return (
@@ -42,6 +58,22 @@ export default function Detail() {
         <div className="max-w-3xl mx-auto px-4 py-3 flex items-center gap-3">
           <Link to="/" className="text-gray-500 hover:text-gray-800">← Geri</Link>
           <Link to="/" className="text-orange font-black text-lg tracking-wider ml-auto">İNDİVA</Link>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => id && setFav(toggleFavorite(id).includes(id))}
+              aria-label="Favorile"
+              className="w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+            >
+              {fav ? '❤️' : '🤍'}
+            </button>
+            <button
+              onClick={handleShare}
+              aria-label="Paylaş"
+              className="w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+            >
+              {copied ? '✓' : '🔗'}
+            </button>
+          </div>
         </div>
       </header>
 
@@ -63,8 +95,12 @@ export default function Detail() {
             )}
             <h1 className="text-xl font-bold text-gray-800 mb-3">{discount.title}</h1>
             <div className="flex items-center gap-2 mb-1">
-              {discount.oldPrice > 0 && discount.oldPrice > discount.newPrice && (
-                <span className="text-gray-400 line-through">{formatPrice(discount.oldPrice)}₺</span>
+              {discount.oldPrice > 0 ? (
+                <span className="text-sm text-white bg-gray-700 px-2 py-1 rounded line-through">
+                  {formatPrice(discount.oldPrice)}₺
+                </span>
+              ) : (
+                <span className="text-xs font-bold text-white bg-gray-700 px-2 py-1 rounded">DİP FİYAT</span>
               )}
               <span className="text-2xl font-extrabold text-orange-dark">{formatPrice(discount.newPrice)}₺</span>
             </div>
