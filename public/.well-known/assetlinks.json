@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.indiva.app",
+      "sha256_cert_fingerprints": [
+        "44:C6:49:89:D7:C5:C0:1B:78:D4:5B:02:0B:0D:44:7D:CA:E8:29:18:B8:42:23:D1:0B:55:72:FF:AA:1D:7D:1D"
+      ]
+    }
+  }
+]
