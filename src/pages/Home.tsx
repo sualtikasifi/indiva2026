@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Header from '../components/Header';
 import CategoryChips from '../components/CategoryChips';
 import DiscountCard from '../components/DiscountCard';
@@ -6,37 +6,61 @@ import { PlayStoreBanner } from '../components/PlayStoreCTA';
 import BottomNav from '../components/BottomNav';
 import { fetchFirstPage, fetchPage, type DiscountsPage } from '../services/discountService';
 import type { Discount } from '../types';
-import type { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 
 export default function Home() {
   const [discounts, setDiscounts] = useState<Discount[]>([]);
-  const [lastVisible, setLastVisible] = useState<QueryDocumentSnapshot<DocumentData> | null>(null);
+  const [cursor, setCursor] = useState<number | null>(null);
   const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [category, setCategory] = useState('Tümü');
   const [search, setSearch] = useState('');
 
+  // loadMore çağrıldığı anda en güncel cursor/hasMore/loadingMore değerlerini
+  // okuyabilmek için ref'te tutuluyor — IntersectionObserver callback'i içinde
+  // state kapanışının (closure) bayatlamasını önler.
+  const stateRef = useRef({ cursor, hasMore, loadingMore });
+  stateRef.current = { cursor, hasMore, loadingMore };
+
   useEffect(() => {
     fetchFirstPage().then((page: DiscountsPage) => {
       setDiscounts(page.discounts);
-      setLastVisible(page.lastVisible);
+      setCursor(page.cursor);
       setHasMore(page.hasMore);
       setLoading(false);
     });
   }, []);
 
-  const loadMore = async () => {
+  const loadMore = useCallback(async () => {
+    const { cursor, hasMore, loadingMore } = stateRef.current;
+    if (loadingMore || !hasMore) return;
     setLoadingMore(true);
-    const page = await fetchPage(lastVisible);
+    const page = await fetchPage(cursor);
     setDiscounts(prev => {
       const ids = new Set(prev.map(d => d.id));
       return [...prev, ...page.discounts.filter(d => !ids.has(d.id))];
     });
-    setLastVisible(page.lastVisible);
+    setCursor(page.cursor);
     setHasMore(page.hasMore);
     setLoadingMore(false);
-  };
+  }, []);
+
+  // Sonsuz kaydırma: callback ref kullanılıyor çünkü sentinel div sadece
+  // yükleme bitince DOM'a giriyor — plain ref + useEffect kombinasyonu, efekt
+  // sentinel henüz yokken (mount anında) çalışıp bir daha hiç yeniden
+  // kurulmadığı için gözlemciyi asla gerçek elemente bağlayamıyordu (panelde
+  // aynı sınıf hatayı düzelttik). Callback ref, elemanın DOM'a her giriş/
+  // çıkışında tetiklendiği için bu sorunu kökten ortadan kaldırıyor.
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const sentinelRef = useCallback((node: HTMLDivElement | null) => {
+    observerRef.current?.disconnect();
+    if (!node) return;
+    observerRef.current = new IntersectionObserver(
+      entries => { if (entries[0].isIntersecting) loadMore(); },
+      { rootMargin: '600px' },
+    );
+    observerRef.current.observe(node);
+  }, [loadMore]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -51,6 +75,8 @@ export default function Home() {
     });
   }, [discounts, category, search]);
 
+  const showInfiniteScroll = !search && category === 'Tümü';
+
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       <Header search={search} onSearch={setSearch} />
@@ -60,7 +86,7 @@ export default function Home() {
           <PlayStoreBanner compact />
         </div>
 
-        <div className="mb-4">
+        <div className="mb-6">
           <CategoryChips selected={category} onSelect={setCategory} />
         </div>
 
@@ -87,15 +113,13 @@ export default function Home() {
               {filtered.map(d => <DiscountCard key={d.id} d={d} />)}
             </div>
 
-            {hasMore && !search && category === 'Tümü' && (
-              <div className="flex justify-center mt-6">
-                <button
-                  onClick={loadMore}
-                  disabled={loadingMore}
-                  className="bg-white border border-gray-200 hover:border-orange text-gray-700 font-semibold px-6 py-2.5 rounded-full disabled:opacity-50 transition-colors"
-                >
-                  {loadingMore ? 'Yükleniyor…' : 'Daha Fazla Göster'}
-                </button>
+            {showInfiniteScroll && (
+              <div ref={sentinelRef} className="flex justify-center py-6">
+                {loadingMore ? (
+                  <div className="w-6 h-6 border-2 border-orange/30 border-t-orange rounded-full animate-spin" />
+                ) : !hasMore && discounts.length > 0 ? (
+                  <p className="text-xs text-gray-400">Tüm fırsatlar yüklendi 🎉</p>
+                ) : null}
               </div>
             )}
           </>

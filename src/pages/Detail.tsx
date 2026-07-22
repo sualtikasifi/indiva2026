@@ -130,15 +130,19 @@ export default function Detail() {
               </p>
             )}
             <h1 className="text-xl font-bold text-gray-800 mb-3">{discount.title}</h1>
-            <div className="flex items-center gap-2 mb-1">
+            <div className="flex items-stretch gap-2 mb-1">
               {discount.oldPrice > 0 ? (
-                <span className="text-sm text-white bg-gray-700 px-2 py-1 rounded line-through">
+                <span className="flex-1 flex items-center justify-center text-sm text-gray-300 bg-gray-700 rounded-lg py-2 px-2 line-through">
                   {formatPrice(discount.oldPrice)}₺
                 </span>
               ) : (
-                <span className="text-xs font-bold text-white bg-gray-700 px-2 py-1 rounded">DİP FİYAT</span>
+                <span className="flex-1 flex items-center justify-center text-xs font-bold text-white bg-gray-700 rounded-lg py-2 px-2">
+                  DİP FİYAT
+                </span>
               )}
-              <span className="text-2xl font-extrabold text-orange-dark">{formatPrice(discount.newPrice)}₺</span>
+              <span className="flex-1 flex items-center justify-center text-xl font-extrabold text-white bg-orange border-2 border-orange-ring rounded-lg py-2 px-2">
+                {formatPrice(discount.newPrice)}₺
+              </span>
             </div>
             <p className="text-xs text-gray-400 mb-5">{timeAgo(discount.createdAt)}</p>
 

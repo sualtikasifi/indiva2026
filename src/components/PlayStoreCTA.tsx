@@ -4,14 +4,14 @@ export function PlayStoreBanner({ compact = false }: { compact?: boolean } = {})
   if (compact) {
     return (
       <div className="bg-gradient-to-r from-orange to-orange-dark rounded-xl px-3.5 py-2.5 flex items-center justify-between gap-3">
-        <p className="text-white text-xs font-semibold">📲 Fırsatları kaçırma, İNDİVA'yı indir</p>
+        <p className="text-white text-xs font-semibold">İndirim fırsatlarını anında yakalayın — İNDİVA'yı indirin</p>
         <a
           href={PLAY_STORE_URL}
           target="_blank"
           rel="noopener noreferrer"
           className="shrink-0 bg-white text-orange-dark font-bold text-xs px-3 py-1.5 rounded-lg hover:bg-orange-50 transition-colors"
         >
-          Aç
+          İndir
         </a>
       </div>
     );

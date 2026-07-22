@@ -21,7 +21,7 @@ export default function Favorites() {
     <div className="min-h-screen bg-gray-50 pb-20">
       <Header search="" onSearch={() => {}} />
       <main className="max-w-6xl mx-auto px-4 py-4">
-        <h1 className="text-lg font-bold text-gray-800 mb-4">❤️ Favorilerim</h1>
+        <h1 className="text-lg font-bold text-gray-800 mb-4 text-center">Favorilerim</h1>
 
         {discounts === null ? (
           <div className="flex justify-center py-16">

@@ -7,6 +7,7 @@ export default {
         orange: {
           DEFAULT: '#f97316',
           dark: '#ea580c',
+          ring: '#fdba74',
         },
       },
     },

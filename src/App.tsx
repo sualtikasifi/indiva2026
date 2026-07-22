@@ -2,6 +2,8 @@ import { Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import Detail from './pages/Detail';
 import Favorites from './pages/Favorites';
+import Aktuel from './pages/Aktuel';
+import AktuelDetail from './pages/AktuelDetail';
 import AppOnly from './pages/AppOnly';
 
 export default function App() {
@@ -10,16 +12,8 @@ export default function App() {
       <Route path="/" element={<Home />} />
       <Route path="/detay/:id" element={<Detail />} />
       <Route path="/favoriler" element={<Favorites />} />
-      <Route
-        path="/aktuel"
-        element={
-          <AppOnly
-            icon="📋"
-            title="Aktüel Ürünler"
-            body="Marketlerin haftalık aktüel kataloglarını görmek için İNDİVA uygulamasını indirin."
-          />
-        }
-      />
+      <Route path="/aktuel" element={<Aktuel />} />
+      <Route path="/aktuel/:store" element={<AktuelDetail />} />
       <Route
         path="/profil"
         element={
